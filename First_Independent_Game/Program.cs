@@ -14,7 +14,22 @@ namespace First_Independent_Game
     {
         static void Main(string[] args)
         {
+            InitWindow(1024, 798,"Catch Food!");
 
+            string background = LoadTexture("foodtrack.png");
+
+            while (true)
+            {
+                DispatchEvents();
+
+                ClearWindow();
+
+                DrawSprite(background, 0, 0);
+
+                DisplayWindow();
+
+                Delay(1);
+            }
 
         }
     }
