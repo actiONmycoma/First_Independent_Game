@@ -1,5 +1,4 @@
 ﻿using First_Independent_Game.Models;
-using First_Independent_Game;
 using SFML.Window;
 using SFML.Learning;
 

@@ -29,7 +29,7 @@ namespace First_Independent_Game
 
         private enum Danger
         {
-            Rock,
+            Rock = 3,
             Knife
         }
 
@@ -72,7 +72,7 @@ namespace First_Independent_Game
             sprite = dogRightMove[4],
             collider = new Collider()
         };
-        
+
 
         static void Main(string[] args)
         {
@@ -97,10 +97,7 @@ namespace First_Independent_Game
             string blurImage = LoadTexture("blur.png");
 
             string healthBar = LoadTexture("health_bar.png");
-                
-            List<Drop> drops = new List<Drop>();
 
-            int score = 0;
 
             bool isNewGame = true;
             bool isExit = false;
@@ -108,17 +105,17 @@ namespace First_Independent_Game
             //-----основной цикл игры-----
             while (!isExit)
             {
-
-
                 PlayMusic(backgroundMusic, 7);
 
-                int timeCount = 0;
+                List<Drop> drops = new List<Drop>();
 
-                int damage = 0;
+                int timeCount = 0;
+                int score = 0;
+
+                int hp = 503;
 
                 while (true)
                 {
-
                     DispatchEvents();
 
                     dog.Move();
@@ -126,10 +123,13 @@ namespace First_Independent_Game
 
                     if (timeCount++ % 100 == 0)
                     {
+                        (string sprite, int id) = GetRandomDropItem();
+
                         Drop drop = new Drop()
                         {
                             speed = 400,
-                            sprite = GetRandomDropItem()
+                            sprite = sprite,
+                            id = id
                         };
 
                         drops.Add(drop);
@@ -145,13 +145,16 @@ namespace First_Independent_Game
                     {
                         if (dog.IsEat(drops[i]))
                         {
-                            damage += 10;
+                            hp += GetDamage(drops[i].id);
+                            score += GetDamage(drops[i].id) / 5;
 
                             drops.RemoveAt(i);
                         }
                     }
 
+                    if (hp <= 0) break;
 
+                    if (hp > 503) hp = 503;
 
 
                     ClearWindow();
@@ -170,7 +173,7 @@ namespace First_Independent_Game
                     //health
                     DrawSprite(healthBar, 10, 20);
                     SetFillColor(240, 39, 39);
-                    FillRectangle(81, 36, 503-damage, 30);
+                    FillRectangle(81, 36, hp, 30);
 
                     //score
                     SetFillColor(0, 0, 0);
@@ -199,20 +202,41 @@ namespace First_Independent_Game
         {
             DrawSprite(drop.sprite, drop.x, drop.y);
         }
-              
 
-
-        static string GetRandomDropItem()
+        static (string sprite, int id) GetRandomDropItem()
         {
             Random rnd = new Random();
 
             int chance = rnd.Next(100);
 
-            if (chance <= 30)
-                return dangerImage[rnd.Next(dangerImage.Length)];
-            else
-                return foodImage[rnd.Next(foodImage.Length)];
+            string image;
+            int id;
 
+            if (chance <= 30)
+            {
+                int index = rnd.Next(dangerImage.Length);
+                image = dangerImage[index];
+                id = index + 3;
+            }
+            else
+            {
+                int index = rnd.Next(foodImage.Length);
+                image = foodImage[index];
+                id = index;
+            }
+
+            return (image, id);
+        }
+
+        static int GetDamage(int id)
+        {
+            if (id == (int)Food.Pizza) return 5;
+            if (id == (int)Food.Choco) return 10;
+            if (id == (int)Food.Burger) return 15;
+            if (id == (int)Danger.Knife) return -50;
+            if (id == (int)Danger.Rock) return -100;
+
+            return 0;
         }
     }
 }

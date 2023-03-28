@@ -13,6 +13,8 @@ namespace First_Independent_Game
         public float speed;
         public string sprite;
 
+        public int id;
+
         public Collider collider = new Collider();
         
 
