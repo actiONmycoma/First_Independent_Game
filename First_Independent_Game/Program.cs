@@ -63,6 +63,13 @@ namespace First_Independent_Game
             LoadTexture("knife.png")
         };
 
+        private static string[] moveButtonsImage =
+        {
+            LoadTexture("a_key_white.png"),
+            LoadTexture("d_key_white.png"),
+            LoadTexture("s_key_white.png")
+        };
+
         private static string[] dogSounds =
         {
             LoadSound("bark.wav"),
@@ -81,7 +88,7 @@ namespace First_Independent_Game
             y = 560,
             direction = 0,
             speed = 500,
-            sprite = dogRightMove[4]            
+            sprite = dogRightMove[4]
         };
 
 
@@ -124,6 +131,12 @@ namespace First_Independent_Game
                 {
                     DispatchEvents();
 
+                    if (killButtonDown) 
+                    { 
+
+                    }
+                    if (helpButtonDown && GetKey(Keyboard.Key.R)==true) helpButtonDown= false;
+
                     if (GetMouseButtonDown(0) == true)
                     {
                         if (MouseX >= 950 && MouseX <= 1010 && MouseY >= 20 && MouseY <= 85) killButtonDown = true;
@@ -131,60 +144,63 @@ namespace First_Independent_Game
                     }
 
 
-                    dog.Move();
-                    dog.GetCollider();
-
-                    spawnMultiplier = score;
-                    if (spawnMultiplier >= 100) spawnMultiplier = 99;
-                    if (timeCount > 3000 && spawnMultiplier < 30) spawnMultiplier = 30;
-                    if (timeCount > 3000 * 3 && spawnMultiplier < 60) spawnMultiplier = 60;
-                    if (timeCount > 3000 * 6 && spawnMultiplier < 90) spawnMultiplier = 90;
-
-                    bool isSpawn = timeCount++ % (100 - spawnMultiplier / 10 * 10) == 0;
-
-                    if (isSpawn)
+                    if (!killButtonDown && !helpButtonDown)
                     {
-                        (string sprite, int id) = GetRandomDropItem(score);
+                        dog.Move();
+                        dog.GetCollider();
 
-                        Drop drop = new Drop()
+                        spawnMultiplier = score;
+                        if (spawnMultiplier >= 100) spawnMultiplier = 99;
+                        if (timeCount > 3000 && spawnMultiplier < 30) spawnMultiplier = 30;
+                        if (timeCount > 3000 * 3 && spawnMultiplier < 60) spawnMultiplier = 60;
+                        if (timeCount > 3000 * 6 && spawnMultiplier < 90) spawnMultiplier = 90;
+
+                        bool isSpawn = timeCount++ % (100 - spawnMultiplier / 10 * 10) == 0;
+
+                        if (isSpawn)
                         {
-                            speed = 400 + score,
-                            sprite = sprite,
-                            id = id
-                        };
+                            (string sprite, int id) = GetRandomDropItem(score);
 
-                        drops.Add(drop);
-                    }
+                            Drop drop = new Drop()
+                            {
+                                speed = 400 + score,
+                                sprite = sprite,
+                                id = id
+                            };
 
-                    for (int i = 0; i < drops.Count; i++)
-                    {
-                        drops[i].Move();
-                        drops[i].GetCollider();
-
-                        if (drops[i].y > 690)
-                        {
-                            drops.RemoveAt(i);
+                            drops.Add(drop);
                         }
-                    }
 
-                    for (int i = 0; i < drops.Count; i++)
-                    {
-                        if (dog.IsEat(drops[i]))
+                        for (int i = 0; i < drops.Count; i++)
                         {
-                            hp += GetHealOrDamage(drops[i].id);
+                            drops[i].Move();
+                            drops[i].GetCollider();
 
-                            score += GetScorePoints(drops[i].id);
-
-                            PlayDogSound(drops[i].id);
-
-                            drops.RemoveAt(i);
+                            if (drops[i].y > 690)
+                            {
+                                drops.RemoveAt(i);
+                            }
                         }
+
+                        for (int i = 0; i < drops.Count; i++)
+                        {
+                            if (dog.IsEat(drops[i]))
+                            {
+                                hp += GetHealOrDamage(drops[i].id);
+
+                                score += GetScorePoints(drops[i].id);
+
+                                PlayDogSound(drops[i].id);
+
+                                drops.RemoveAt(i);
+                            }
+                        }
+
+                        if (hp <= 0) break;
+
+                        if (hp > 503) hp = 503;
+                        if (score < 0) score = 0;
                     }
-
-                    if (hp <= 0) break;
-
-                    if (hp > 503) hp = 503;
-                    if (score < 0) score = 0;
 
                     ClearWindow();
 
@@ -212,10 +228,10 @@ namespace First_Independent_Game
 
                     if (killButtonDown || helpButtonDown)
                     {
-                        while (true)
-                        {
+                        DrawSprite(blurImage, 0, 0);
 
-                        }
+                        if (helpButtonDown) DrawHelpMenu();
+                        if (killButtonDown) DrawKillMenu();
                     }
 
                     DisplayWindow();
@@ -240,6 +256,41 @@ namespace First_Independent_Game
         static void DrawDrop(Drop drop)
         {
             DrawSprite(drop.sprite, drop.x, drop.y);
+        }
+
+        static void DrawHelpMenu()
+        {
+            SetFillColor(255, 255, 255);
+
+            DrawSprite(moveButtonsImage[0], 70, 120);
+            DrawSprite(moveButtonsImage[1], 67, 220);
+            DrawSprite(moveButtonsImage[2], 66, 315);
+
+            DrawText(167, 137, "move left", 40);
+            DrawText(167, 237, "move right", 40);
+            DrawText(167, 337, "if you want to seat", 40);
+
+            for (int i = 0; i < foodImage.Length; i++)
+            {
+                DrawSprite(foodImage[i], 70 + i * 60, 450);
+            }
+
+            DrawText(260, 460, "eat this to heal and take points", 30);
+
+            for (int i = 0; i < dangerImage.Length; i++)
+            {
+                DrawSprite(dangerImage[i], 70 + i * 70, 520);
+            }
+
+            DrawText(260, 520, "avoid this to stay alive", 30);
+
+            DrawText(385, 600, "press \" R \" to continue", 25);
+
+        }
+
+        static void DrawKillMenu()
+        {
+
         }
 
         static void PlayDogSound(int dropId)
