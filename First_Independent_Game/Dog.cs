@@ -18,13 +18,15 @@ namespace First_Independent_Game
         {
             if (GetKey(Keyboard.Key.A) == true)
             {
-                x -= speed * DeltaTime;
+                if (x > 0) x -= speed * DeltaTime;
+
                 direction = 1;
             }
 
             if (GetKey(Keyboard.Key.D) == true)
             {
-                x += speed * DeltaTime;
+                if (x + collider.width < 1024) x += speed * DeltaTime;
+
                 direction = 2;
             }
 
