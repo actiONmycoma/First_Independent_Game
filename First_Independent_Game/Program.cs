@@ -63,6 +63,18 @@ namespace First_Independent_Game
             LoadTexture("knife.png")
         };
 
+        private static string[] dogSounds =
+        {
+                LoadSound("bark.wav"),
+                LoadSound("bark2.wav"),
+                LoadSound("ouch.wav"),
+                LoadSound("slurp.wav"),
+                LoadSound("smack.wav"),
+                LoadSound("whine.wav"),
+                LoadSound("eat.wav")
+            };
+
+
         private static Dog dog = new Dog()
         {
             x = 395,
@@ -82,16 +94,6 @@ namespace First_Independent_Game
 
             string backgroundMusic = LoadMusic("slow_8_Bit_Retro_Funk_background.wav");
 
-            string[] dogSounds =
-            {
-                LoadSound("bark.wav"),
-                LoadSound("bark2.wav"),
-                LoadSound("ouch.wav"),
-                LoadSound("slurp.wav"),
-                LoadSound("smack.wav"),
-                LoadSound("whine.wav"),
-                LoadSound("eat.wav")
-            };
 
             string backgroundImage = LoadTexture("foodtrack.png");
             string blurImage = LoadTexture("blur.png");
@@ -135,9 +137,9 @@ namespace First_Independent_Game
 
                     spawnMultiplier = score;
                     if (spawnMultiplier >= 100) spawnMultiplier = 99;
-                    if (timeCount > 60000 && spawnMultiplier < 30) spawnMultiplier = 30;
-                    if (timeCount > 60000 * 3 && spawnMultiplier < 60) spawnMultiplier = 60;
-                    if (timeCount > 60000 * 6 && spawnMultiplier < 90) spawnMultiplier = 90;
+                    if (timeCount > 3000 && spawnMultiplier < 30) spawnMultiplier = 30;
+                    if (timeCount > 3000 * 3 && spawnMultiplier < 60) spawnMultiplier = 60;
+                    if (timeCount > 3000 * 6 && spawnMultiplier < 90) spawnMultiplier = 90;
 
                     bool isSpawn = timeCount++ % (100 - spawnMultiplier / 10 * 10) == 0;
 
@@ -171,7 +173,10 @@ namespace First_Independent_Game
                         if (dog.IsEat(drops[i]))
                         {
                             hp += GetDamage(drops[i].id);
-                            score += GetDamage(drops[i].id) / 5;
+
+                            if (drops[i].id < 3) score += GetDamage(drops[i].id) / 5;
+
+                            PlayDogSound(drops[i].id);
 
                             drops.RemoveAt(i);
                         }
@@ -185,7 +190,7 @@ namespace First_Independent_Game
                     ClearWindow();
 
                     DrawSprite(backgroundImage, 0, 0);
-
+                    
                     //drop
                     for (int i = 0; i < drops.Count; i++)
                     {
@@ -238,6 +243,15 @@ namespace First_Independent_Game
             DrawSprite(drop.sprite, drop.x, drop.y);
         }
 
+        static void PlayDogSound(int dropId)
+        {
+            if (dropId == (int)Food.Pizza) PlaySound(dogSounds[(int)DogSounds.Eat]) ;
+            if (dropId == (int)Food.Choco) PlaySound(dogSounds[(int)DogSounds.Slurp]);
+            if (dropId == (int)Food.Burger) PlaySound(dogSounds[(int)DogSounds.Bark2]);
+            if (dropId == (int)Danger.Knife) PlaySound(dogSounds[(int)DogSounds.Whine]);
+            if (dropId == (int)Danger.Rock) PlaySound(dogSounds[(int)DogSounds.Smack]);
+        }
+
         static (string sprite, int id) GetRandomDropItem(int score)
         {
             Random rnd = new Random();
@@ -267,13 +281,13 @@ namespace First_Independent_Game
             return (image, id);
         }
 
-        static int GetDamage(int id)
+        static int GetDamage(int dropId)
         {
-            if (id == (int)Food.Pizza) return 5;
-            if (id == (int)Food.Choco) return 10;
-            if (id == (int)Food.Burger) return 15;
-            if (id == (int)Danger.Knife) return -50;
-            if (id == (int)Danger.Rock) return -100;
+            if (dropId == (int)Food.Pizza) return 5;
+            if (dropId == (int)Food.Choco) return 10;
+            if (dropId == (int)Food.Burger) return 15;
+            if (dropId == (int)Danger.Knife) return -50;
+            if (dropId == (int)Danger.Rock) return -100;
 
             return 0;
         }
