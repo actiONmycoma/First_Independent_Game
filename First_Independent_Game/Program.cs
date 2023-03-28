@@ -2,6 +2,8 @@
 using SFML.Window;
 using SFML.Learning;
 using System.Collections.Generic;
+using First_Independent_Game;
+using First_Independent_Game.Models;
 
 namespace First_Independent_Game
 {
@@ -61,16 +63,16 @@ namespace First_Independent_Game
             LoadTexture("knife.png")
         };
 
-        private static float dogX = 395;
-        private static float dogY = 560;
-        private static float dogColliderX = dogX - 10;
-        private static float dogColliderY = dogY - 10;
-        private static int colliderHeight = 120;
-        private static int colliderWidth = 130;
-
-        private static int dogDirection = 0;
-        private static float dogSpeed = 500;
-
+        private static Dog dog = new Dog()
+        {
+            x = 395,
+            y = 560,
+            direction = 0,
+            speed = 500,
+            sprite = dogRightMove[4],
+            collider = new Collider()
+        };
+        
         private static float dropSpeed = 400;
 
         static void Main(string[] args)
@@ -121,7 +123,8 @@ namespace First_Independent_Game
                 {
                     DispatchEvents();
 
-                    DogMove();
+                    dog.DogMove();
+                    dog.GetCollider();
 
                     if (timeCount++ % 100 == 0)
                     {
@@ -167,52 +170,24 @@ namespace First_Independent_Game
 
         static void DrawDog()
         {
-            if (dogDirection == -1) DrawSprite(dogLeftMove[4], dogX, dogY);
-            if (dogDirection == 0) DrawSprite(dogRightMove[4], dogX, dogY);
+            if (dog.direction == -1) DrawSprite(dogLeftMove[4], dog.x, dog.y);
+            if (dog.direction == 0) DrawSprite(dogRightMove[4], dog.x, dog.y);
 
-            if (dogDirection == 1) DrawSprite(dogLeftMove[0], dogX, dogY);
+            if (dog.direction == 1) DrawSprite(dogLeftMove[0], dog.x, dog.y);
 
-            if (dogDirection == 2) DrawSprite(dogRightMove[0], dogX, dogY);
+            if (dog.direction == 2) DrawSprite(dogRightMove[0], dog.x, dog.y);
         }
 
         static void DrawDrop(float[] position, string image)
         {
             DrawSprite(image, position[0], position[1]);
         }
-
-        static void DogMove()
-        {
-            if (GetKey(Keyboard.Key.A) == true)
-            {
-                dogX -= dogSpeed * DeltaTime;
-                dogDirection = 1;
-            }
-
-            if (GetKey(Keyboard.Key.D) == true)
-            {
-                dogX += dogSpeed * DeltaTime;
-                dogDirection = 2;
-            }
-
-            if (GetKeyDown(Keyboard.Key.S) == true)
-            {
-                if (dogDirection == 1) dogDirection = -1;
-                if (dogDirection == 2) dogDirection = 0;
-            }
-
-        }
-
+        
         static void DropMove(float[] dropPosition)
         {
             dropPosition[1] += dropSpeed * DeltaTime;
         }
-
-        static int[] GetDogCollider()
-        {
-            int[] collider;
-
-            if (dogDirection == -1) ;
-        }
+                
 
         static float[] GetDropStartPosition()
         {

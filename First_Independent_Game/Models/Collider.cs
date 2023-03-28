@@ -8,8 +8,8 @@ namespace First_Independent_Game.Models
 {
     internal class Collider
     {
-        public int x;
-        public int y;
+        public float x;
+        public float y;
         public int width;
         public int height;
     }
