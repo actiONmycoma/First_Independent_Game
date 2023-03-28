@@ -1,4 +1,5 @@
 ﻿using First_Independent_Game.Models;
+using First_Independent_Game;
 using SFML.Window;
 using SFML.Learning;
 
@@ -12,9 +13,9 @@ namespace First_Independent_Game
         public int direction;
         public string sprite;
 
-        public Collider collider;
+        public Collider collider = new Collider();
 
-        public void DogMove()
+        public void Move()
         {
             if (GetKey(Keyboard.Key.A) == true)
             {
@@ -64,6 +65,12 @@ namespace First_Independent_Game
 
             collider.y = y + 25;
             collider.height = 120;
+        }
+
+        public bool IsEat(Drop drop)
+        {
+            return collider.x + collider.width >= drop.collider.x && collider.x <= drop.collider.x + drop.collider.width
+                && collider.y + collider.height >= drop.collider.y && collider.y <= drop.collider.y + drop.collider.height;
         }
     }
 }

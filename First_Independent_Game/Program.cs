@@ -73,7 +73,6 @@ namespace First_Independent_Game
             collider = new Collider()
         };
         
-        private static float dropSpeed = 400;
 
         static void Main(string[] args)
         {
@@ -98,12 +97,8 @@ namespace First_Independent_Game
             string blurImage = LoadTexture("blur.png");
 
             string healthBar = LoadTexture("health_bar.png");
-
-
-
-            float[] newDropPosition;
-            List<string> drops = new List<string>();
-            List<float[]> dropPositions = new List<float[]>();
+                
+            List<Drop> drops = new List<Drop>();
 
             int score = 0;
 
@@ -119,23 +114,45 @@ namespace First_Independent_Game
 
                 int timeCount = 0;
 
+                int damage = 0;
+
                 while (true)
                 {
+
                     DispatchEvents();
 
-                    dog.DogMove();
+                    dog.Move();
                     dog.GetCollider();
 
                     if (timeCount++ % 100 == 0)
                     {
-                        dropPositions.Add(GetDropStartPosition());
-                        drops.Add(GetRandomDrop());
+                        Drop drop = new Drop()
+                        {
+                            speed = 400,
+                            sprite = GetRandomDropItem()
+                        };
+
+                        drops.Add(drop);
                     }
 
-                    for (int i = 0; i < dropPositions.Count; i++)
+                    for (int i = 0; i < drops.Count; i++)
                     {
-                        DropMove(dropPositions[i]);
+                        drops[i].Move();
+                        drops[i].GetCollider();
                     }
+
+                    for (int i = 0; i < drops.Count; i++)
+                    {
+                        if (dog.IsEat(drops[i]))
+                        {
+                            damage += 10;
+
+                            drops.RemoveAt(i);
+                        }
+                    }
+
+
+
 
                     ClearWindow();
 
@@ -144,7 +161,7 @@ namespace First_Independent_Game
                     //drop
                     for (int i = 0; i < drops.Count; i++)
                     {
-                        DrawDrop(dropPositions[i], drops[i]);
+                        DrawDrop(drops[i]);
                     }
 
                     //dog                    
@@ -153,7 +170,7 @@ namespace First_Independent_Game
                     //health
                     DrawSprite(healthBar, 10, 20);
                     SetFillColor(240, 39, 39);
-                    FillRectangle(81, 36, 503, 30);
+                    FillRectangle(81, 36, 503-damage, 30);
 
                     //score
                     SetFillColor(0, 0, 0);
@@ -178,25 +195,14 @@ namespace First_Independent_Game
             if (dog.direction == 2) DrawSprite(dogRightMove[0], dog.x, dog.y);
         }
 
-        static void DrawDrop(float[] position, string image)
+        static void DrawDrop(Drop drop)
         {
-            DrawSprite(image, position[0], position[1]);
+            DrawSprite(drop.sprite, drop.x, drop.y);
         }
-        
-        static void DropMove(float[] dropPosition)
-        {
-            dropPosition[1] += dropSpeed * DeltaTime;
-        }
-                
+              
 
-        static float[] GetDropStartPosition()
-        {
-            Random rnd = new Random();
 
-            return new float[] { rnd.Next(25, 1000), -50 };
-        }
-
-        static string GetRandomDrop()
+        static string GetRandomDropItem()
         {
             Random rnd = new Random();
 
