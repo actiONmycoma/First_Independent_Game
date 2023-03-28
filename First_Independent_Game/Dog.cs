@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using First_Independent_Game.Models;
+﻿using First_Independent_Game.Models;
 using SFML.Window;
-using SFML.System;
 using SFML.Learning;
 
 namespace First_Independent_Game
@@ -14,8 +8,8 @@ namespace First_Independent_Game
     {
         public float x;
         public float y;
-        public int direction;
         public float speed;
+        public int direction;
         public string sprite;
 
         public Collider collider;
@@ -58,13 +52,13 @@ namespace First_Independent_Game
 
             if (direction == 1)
             {
-                collider.x = x+5;
+                collider.x = x + 5;
                 collider.width = 120;
             }
 
             if (direction == 2)
             {
-                collider.x = x+25;
+                collider.x = x + 25;
                 collider.width = 109;
             }
 
