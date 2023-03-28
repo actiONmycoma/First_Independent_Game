@@ -65,14 +65,14 @@ namespace First_Independent_Game
 
         private static string[] dogSounds =
         {
-                LoadSound("bark.wav"),
-                LoadSound("bark2.wav"),
-                LoadSound("ouch.wav"),
-                LoadSound("slurp.wav"),
-                LoadSound("smack.wav"),
-                LoadSound("whine.wav"),
-                LoadSound("eat.wav")
-            };
+            LoadSound("bark.wav"),
+            LoadSound("bark2.wav"),
+            LoadSound("ouch.wav"),
+            LoadSound("slurp.wav"),
+            LoadSound("smack.wav"),
+            LoadSound("whine.wav"),
+            LoadSound("eat.wav")
+        };
 
 
         private static Dog dog = new Dog()
@@ -82,7 +82,7 @@ namespace First_Independent_Game
             direction = 0,
             speed = 500,
             sprite = dogRightMove[4],
-            collider = new Collider()
+            //collider = new Collider()
         };
 
 
@@ -149,7 +149,7 @@ namespace First_Independent_Game
 
                         Drop drop = new Drop()
                         {
-                            speed = 400,
+                            speed = 400 + score,
                             sprite = sprite,
                             id = id
                         };
@@ -190,7 +190,7 @@ namespace First_Independent_Game
                     ClearWindow();
 
                     DrawSprite(backgroundImage, 0, 0);
-                    
+
                     //drop
                     for (int i = 0; i < drops.Count; i++)
                     {
@@ -245,7 +245,7 @@ namespace First_Independent_Game
 
         static void PlayDogSound(int dropId)
         {
-            if (dropId == (int)Food.Pizza) PlaySound(dogSounds[(int)DogSounds.Eat]) ;
+            if (dropId == (int)Food.Pizza) PlaySound(dogSounds[(int)DogSounds.Eat]);
             if (dropId == (int)Food.Choco) PlaySound(dogSounds[(int)DogSounds.Slurp]);
             if (dropId == (int)Food.Burger) PlaySound(dogSounds[(int)DogSounds.Bark2]);
             if (dropId == (int)Danger.Knife) PlaySound(dogSounds[(int)DogSounds.Whine]);
