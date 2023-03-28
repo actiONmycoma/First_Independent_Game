@@ -69,7 +69,7 @@ namespace First_Independent_Game
         private static int colliderWidth = 130;
 
         private static int dogDirection = 0;
-        private static float dogSpeed = 400;
+        private static float dogSpeed = 500;
 
         private static float dropSpeed = 400;
 
@@ -207,19 +207,27 @@ namespace First_Independent_Game
             dropPosition[1] += dropSpeed * DeltaTime;
         }
 
+        static int[] GetDogCollider()
+        {
+            int[] collider;
+
+            if (dogDirection == -1) ;
+        }
+
         static float[] GetDropStartPosition()
         {
             Random rnd = new Random();
 
             return new float[] { rnd.Next(25, 1000), -50 };
         }
+
         static string GetRandomDrop()
         {
             Random rnd = new Random();
 
-            int food = rnd.Next(2);
+            int chance = rnd.Next(100);
 
-            if (food == 0)
+            if (chance <= 30)
                 return dangerImage[rnd.Next(dangerImage.Length)];
             else
                 return foodImage[rnd.Next(foodImage.Length)];
