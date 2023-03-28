@@ -98,6 +98,8 @@ namespace First_Independent_Game
 
             string healthBar = LoadTexture("health_bar.png");
 
+            string help = LoadTexture("help.png");//60x60
+            string kill = LoadTexture("kill.png");//60x65
 
             bool isNewGame = true;
             bool isExit = false;
@@ -112,12 +114,21 @@ namespace First_Independent_Game
                 int timeCount = 0;
                 int score = 0;
                 int spawnMultiplier = 0;
-
                 int hp = 503;
+
+                bool killButtonDown = false;
+                bool helpButtonDown = false;
 
                 while (true)
                 {
                     DispatchEvents();
+
+                    if (GetMouseButtonDown(0) == true)
+                    {
+                        if (MouseX >= 950 && MouseX <= 1010 && MouseY >= 20 && MouseY <= 85) killButtonDown = true;
+                        if (MouseX >= 950 && MouseX <= 1010 && MouseY >= 100 && MouseY <= 160) helpButtonDown = true;
+                    }
+
 
                     dog.Move();
                     dog.GetCollider();
@@ -171,7 +182,6 @@ namespace First_Independent_Game
                     if (hp > 503) hp = 503;
                     if (score < 0) score = 0;
 
-
                     ClearWindow();
 
                     DrawSprite(backgroundImage, 0, 0);
@@ -181,18 +191,28 @@ namespace First_Independent_Game
                     {
                         DrawDrop(drops[i]);
                     }
-
                     //dog                    
                     DrawDog();
-
                     //health
                     DrawSprite(healthBar, 10, 20);
                     SetFillColor(240, 39, 39);
                     FillRectangle(81, 36, hp, 30);
-
                     //score
                     SetFillColor(0, 0, 0);
                     DrawText(70, 80, $"SCORE: {score}", 30);
+                    //menu
+                    DrawSprite(kill, 950, 20);
+                    DrawSprite(help, 950, 100);
+
+                    DrawText(0, 0, Convert.ToString(timeCount), 10);
+
+                    if (killButtonDown || helpButtonDown)
+                    {
+                        while (true)
+                        {
+
+                        }
+                    }
 
                     DisplayWindow();
 
