@@ -111,6 +111,7 @@ namespace First_Independent_Game
 
                 int timeCount = 0;
                 int score = 0;
+                int spawnMultiplier = 0;
 
                 int hp = 503;
 
@@ -121,9 +122,17 @@ namespace First_Independent_Game
                     dog.Move();
                     dog.GetCollider();
 
-                    if (timeCount++ % 100 == 0)
+                    spawnMultiplier = score;
+                    if (spawnMultiplier >= 100) spawnMultiplier = 99;
+                    if (timeCount > 60000 && spawnMultiplier < 30) spawnMultiplier = 30;
+                    if (timeCount > 60000 * 3 && spawnMultiplier < 60) spawnMultiplier = 60;
+                    if (timeCount > 60000 * 6 && spawnMultiplier < 90) spawnMultiplier = 90;
+
+                    bool isSpawn = timeCount++ % (100 - spawnMultiplier / 10 * 10) == 0;
+
+                    if (isSpawn)
                     {
-                        (string sprite, int id) = GetRandomDropItem();
+                        (string sprite, int id) = GetRandomDropItem(score);
 
                         Drop drop = new Drop()
                         {
@@ -139,6 +148,11 @@ namespace First_Independent_Game
                     {
                         drops[i].Move();
                         drops[i].GetCollider();
+
+                        if (drops[i].y > 690)
+                        {
+                            drops.RemoveAt(i);
+                        }
                     }
 
                     for (int i = 0; i < drops.Count; i++)
@@ -155,6 +169,7 @@ namespace First_Independent_Game
                     if (hp <= 0) break;
 
                     if (hp > 503) hp = 503;
+                    if (score < 0) score = 0;
 
 
                     ClearWindow();
@@ -203,16 +218,20 @@ namespace First_Independent_Game
             DrawSprite(drop.sprite, drop.x, drop.y);
         }
 
-        static (string sprite, int id) GetRandomDropItem()
+        static (string sprite, int id) GetRandomDropItem(int score)
         {
             Random rnd = new Random();
 
             int chance = rnd.Next(100);
 
+            int scoreMultiplier = score / 3;
+
+            if (scoreMultiplier > 40) scoreMultiplier = 40;
+
             string image;
             int id;
 
-            if (chance <= 30)
+            if (chance <= 30 + scoreMultiplier)
             {
                 int index = rnd.Next(dangerImage.Length);
                 image = dangerImage[index];
