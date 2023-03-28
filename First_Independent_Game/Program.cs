@@ -81,8 +81,7 @@ namespace First_Independent_Game
             y = 560,
             direction = 0,
             speed = 500,
-            sprite = dogRightMove[4],
-            //collider = new Collider()
+            sprite = dogRightMove[4]            
         };
 
 
@@ -172,9 +171,9 @@ namespace First_Independent_Game
                     {
                         if (dog.IsEat(drops[i]))
                         {
-                            hp += GetDamage(drops[i].id);
+                            hp += GetHealOrDamage(drops[i].id);
 
-                            if (drops[i].id < 3) score += GetDamage(drops[i].id) / 5;
+                            score += GetScorePoints(drops[i].id);
 
                             PlayDogSound(drops[i].id);
 
@@ -281,13 +280,26 @@ namespace First_Independent_Game
             return (image, id);
         }
 
-        static int GetDamage(int dropId)
+        static int GetHealOrDamage(int dropId)
         {
             if (dropId == (int)Food.Pizza) return 5;
             if (dropId == (int)Food.Choco) return 10;
             if (dropId == (int)Food.Burger) return 15;
+
             if (dropId == (int)Danger.Knife) return -50;
             if (dropId == (int)Danger.Rock) return -100;
+
+            return 0;
+        }
+
+        static int GetScorePoints(int dropId)
+        {
+            if (dropId == (int)Food.Pizza) return 1;
+            if (dropId == (int)Food.Choco) return 2;
+            if (dropId == (int)Food.Burger) return 3;
+
+            if (dropId == (int)Danger.Knife) return -2;
+            if (dropId == (int)Danger.Rock) return -5;
 
             return 0;
         }
