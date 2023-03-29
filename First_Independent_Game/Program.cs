@@ -70,6 +70,13 @@ namespace First_Independent_Game
             LoadTexture("s_key_white.png")
         };
 
+        private static string[] buttons =
+        {
+            LoadTexture("yes_button.png"),
+            LoadTexture("no_button.png"),
+            LoadTexture("continue_button.png")
+        };
+
         private static string[] dogSounds =
         {
             LoadSound("bark.wav"),
@@ -125,17 +132,23 @@ namespace First_Independent_Game
                 int hp = 503;
 
                 bool killButtonDown = false;
-                bool helpButtonDown = false;
+                bool helpButtonDown = true;
 
                 while (true)
                 {
                     DispatchEvents();
 
-                    if (killButtonDown) 
-                    { 
+                    if (killButtonDown)
+                    {
 
                     }
-                    if (helpButtonDown && GetKey(Keyboard.Key.R)==true) helpButtonDown= false;
+                    if (helpButtonDown)
+                    {
+                        bool isContinuePressed = GetMouseButtonDown(0) && MouseX >= 350
+                            && MouseY >= 580 && MouseX <= 638 && MouseY <= 680;
+
+                        if(isContinuePressed) helpButtonDown = false;
+                    }
 
                     if (GetMouseButtonDown(0) == true)
                     {
@@ -232,6 +245,7 @@ namespace First_Independent_Game
 
                         if (helpButtonDown) DrawHelpMenu();
                         if (killButtonDown) DrawKillMenu();
+
                     }
 
                     DisplayWindow();
@@ -284,13 +298,18 @@ namespace First_Independent_Game
 
             DrawText(260, 520, "avoid this to stay alive", 30);
 
-            DrawText(385, 600, "press \" R \" to continue", 25);
+            DrawSprite(buttons[2], 350, 580);
 
         }
 
         static void DrawKillMenu()
         {
+            SetFillColor(167, 10, 46);
 
+            DrawText(220, 300, "WANNA  SUISIDE?", 80);
+
+            DrawSprite(buttons[2], 450, 500);
+            DrawSprite(buttons[2], 450, 500);
         }
 
         static void PlayDogSound(int dropId)
