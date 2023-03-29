@@ -25,7 +25,7 @@ namespace First_Independent_Game
             Pizza,
             Choco,
             Burger
-        }
+        }        
 
         private enum Danger
         {
@@ -88,6 +88,17 @@ namespace First_Independent_Game
             LoadSound("eat.wav")
         };
 
+        private static string backgroundMusic = LoadMusic("slow_8_Bit_Retro_Funk_background.wav");
+
+        private static string backgroundImage = LoadTexture("foodtrack.png");
+        private static string blurImage = LoadTexture("blur.png");
+
+        private static string healthBar = LoadTexture("health_bar.png");
+
+        private static string help = LoadTexture("help.png");
+        private static string kill = LoadTexture("kill.png");
+
+        private static string gameOverImage = LoadTexture("game_over_white.png");
 
         private static Dog dog = new Dog()
         {
@@ -105,21 +116,9 @@ namespace First_Independent_Game
 
             SetFont("Webcomic.ttf");
 
-            string backgroundMusic = LoadMusic("slow_8_Bit_Retro_Funk_background.wav");
-
-
-            string backgroundImage = LoadTexture("foodtrack.png");
-            string blurImage = LoadTexture("blur.png");
-
-            string healthBar = LoadTexture("health_bar.png");
-
-            string help = LoadTexture("help.png");//60x60
-            string kill = LoadTexture("kill.png");//60x65
-
-            bool isNewGame = true;
+            int bestScore = 0;
             bool isExit = false;
 
-            //-----основной цикл игры-----
             while (!isExit)
             {
                 PlayMusic(backgroundMusic, 7);
@@ -127,12 +126,14 @@ namespace First_Independent_Game
                 List<Drop> drops = new List<Drop>();
 
                 int timeCount = 0;
-                int score = 0;
                 int spawnMultiplier = 0;
                 int hp = 503;
+                int score = 0;
 
                 bool killButtonDown = false;
-                bool helpButtonDown = true;
+                bool helpButtonDown = false;
+
+                bool isKilled = false;
 
                 while (true)
                 {
@@ -140,24 +141,51 @@ namespace First_Independent_Game
 
                     if (killButtonDown)
                     {
+                        bool isYesPressed = GetMouseButton(0) && MouseX >= 200
+                            && MouseY >= 500 && MouseX <= 417 && MouseY <= 608;
 
+                        bool isNoPressed = GetMouseButton(0) && MouseX >= 600
+                            && MouseY >= 500 && MouseX <= 817 && MouseY <= 608;
+
+                        if (isNoPressed) killButtonDown = false;
+                        if (isYesPressed)
+                        {
+                            PlaySound(dogSounds[(int)DogSounds.Ouch]);
+                            killButtonDown = false;
+                            isKilled = true;
+                        }
                     }
                     if (helpButtonDown)
                     {
-                        bool isContinuePressed = GetMouseButtonDown(0) && MouseX >= 350
+                        bool isContinuePressed = GetMouseButton(0) && MouseX >= 350
                             && MouseY >= 580 && MouseX <= 638 && MouseY <= 680;
 
-                        if(isContinuePressed) helpButtonDown = false;
+                        if (isContinuePressed) helpButtonDown = false;
                     }
 
-                    if (GetMouseButtonDown(0) == true)
+                    if (isKilled)
+                    {
+                        bool isYesPressed = GetMouseButton(0) && MouseX >= 200
+                            && MouseY >= 560 && MouseX <= 417 && MouseY <= 668;
+
+                        bool isNoPressed = GetMouseButton(0) && MouseX >= 600
+                            && MouseY >= 560 && MouseX <= 817 && MouseY <= 668;
+
+                        if (isYesPressed) break;
+                        if (isNoPressed)
+                        {
+                            isExit = true;
+                            break;
+                        }
+                    }
+
+                    if (GetMouseButton(0) == true)
                     {
                         if (MouseX >= 950 && MouseX <= 1010 && MouseY >= 20 && MouseY <= 85) killButtonDown = true;
                         if (MouseX >= 950 && MouseX <= 1010 && MouseY >= 100 && MouseY <= 160) helpButtonDown = true;
                     }
 
-
-                    if (!killButtonDown && !helpButtonDown)
+                    if (!killButtonDown && !helpButtonDown && !isKilled)
                     {
                         dog.Move();
                         dog.GetCollider();
@@ -192,6 +220,7 @@ namespace First_Independent_Game
                             if (drops[i].y > 690)
                             {
                                 drops.RemoveAt(i);
+                                if (drops[i].id < Enum.GetValues(typeof(Food)).Length) score--;
                             }
                         }
 
@@ -203,49 +232,59 @@ namespace First_Independent_Game
 
                                 score += GetScorePoints(drops[i].id);
 
-                                PlayDogSound(drops[i].id);
+                                PlayDogPickSound(drops[i].id);
 
                                 drops.RemoveAt(i);
                             }
                         }
 
-                        if (hp <= 0) break;
-
                         if (hp > 503) hp = 503;
                         if (score < 0) score = 0;
+
+                        if (hp <= 0)
+                        {
+                            PlaySound(dogSounds[(int)DogSounds.Ouch]);
+
+                            hp = 0;
+                            isKilled = true;
+                        }
+
+                        if (isKilled)
+                        {
+                            if (score > bestScore) bestScore = score;
+                        }
+
                     }
 
                     ClearWindow();
 
                     DrawSprite(backgroundImage, 0, 0);
 
-                    //drop
+
                     for (int i = 0; i < drops.Count; i++)
                     {
                         DrawDrop(drops[i]);
                     }
-                    //dog                    
+
                     DrawDog();
-                    //health
+
                     DrawSprite(healthBar, 10, 20);
                     SetFillColor(240, 39, 39);
                     FillRectangle(81, 36, hp, 30);
-                    //score
+
                     SetFillColor(0, 0, 0);
                     DrawText(70, 80, $"SCORE: {score}", 30);
-                    //menu
+
                     DrawSprite(kill, 950, 20);
-                    DrawSprite(help, 950, 100);
+                    DrawSprite(help, 950, 100);                   
 
-                    DrawText(0, 0, Convert.ToString(timeCount), 10);
-
-                    if (killButtonDown || helpButtonDown)
+                    if (killButtonDown || helpButtonDown || isKilled)
                     {
                         DrawSprite(blurImage, 0, 0);
 
+                        if (killButtonDown) DrawSuicideMenu();
                         if (helpButtonDown) DrawHelpMenu();
-                        if (killButtonDown) DrawKillMenu();
-
+                        if (isKilled) DrawEndGameMenu(score, bestScore);
                     }
 
                     DisplayWindow();
@@ -257,7 +296,7 @@ namespace First_Independent_Game
 
         }
 
-        static void DrawDog()
+        private static void DrawDog()
         {
             if (dog.direction == -1) DrawSprite(dogLeftMove[4], dog.x, dog.y);
             if (dog.direction == 0) DrawSprite(dogRightMove[4], dog.x, dog.y);
@@ -267,12 +306,12 @@ namespace First_Independent_Game
             if (dog.direction == 2) DrawSprite(dogRightMove[0], dog.x, dog.y);
         }
 
-        static void DrawDrop(Drop drop)
+        private static void DrawDrop(Drop drop)
         {
             DrawSprite(drop.sprite, drop.x, drop.y);
         }
 
-        static void DrawHelpMenu()
+        private static void DrawHelpMenu()
         {
             SetFillColor(255, 255, 255);
 
@@ -302,17 +341,32 @@ namespace First_Independent_Game
 
         }
 
-        static void DrawKillMenu()
+        private static void DrawSuicideMenu()
         {
-            SetFillColor(167, 10, 46);
+            SetFillColor(210, 10, 46);
 
-            DrawText(220, 300, "WANNA  SUISIDE?", 80);
+            DrawText(220, 300, "WANNA  SUICIDE?", 80);
 
-            DrawSprite(buttons[2], 450, 500);
-            DrawSprite(buttons[2], 450, 500);
+            DrawSprite(buttons[0], 200, 500);
+            DrawSprite(buttons[1], 600, 500);
         }
 
-        static void PlayDogSound(int dropId)
+        private static void DrawEndGameMenu(int score, int bestScore)
+        {
+            SetFillColor(255, 255, 255);
+
+            DrawSprite(gameOverImage, 330, 100);
+
+            DrawText(200, 400, $"score: {score}", 30);
+            DrawText(600, 400, $"best score: {bestScore}", 30);
+
+            DrawText(340, 500, "go to main menu?", 40);
+
+            DrawSprite(buttons[0], 200, 560);
+            DrawSprite(buttons[1], 600, 560);
+        }
+
+        private static void PlayDogPickSound(int dropId)
         {
             if (dropId == (int)Food.Pizza) PlaySound(dogSounds[(int)DogSounds.Eat]);
             if (dropId == (int)Food.Choco) PlaySound(dogSounds[(int)DogSounds.Slurp]);
@@ -321,7 +375,7 @@ namespace First_Independent_Game
             if (dropId == (int)Danger.Rock) PlaySound(dogSounds[(int)DogSounds.Smack]);
         }
 
-        static (string sprite, int id) GetRandomDropItem(int score)
+        private static (string sprite, int id) GetRandomDropItem(int score)
         {
             Random rnd = new Random();
 
@@ -338,7 +392,7 @@ namespace First_Independent_Game
             {
                 int index = rnd.Next(dangerImage.Length);
                 image = dangerImage[index];
-                id = index + 3;
+                id = index + Enum.GetValues(typeof(Food)).Length;
             }
             else
             {
@@ -350,7 +404,7 @@ namespace First_Independent_Game
             return (image, id);
         }
 
-        static int GetHealOrDamage(int dropId)
+        private static int GetHealOrDamage(int dropId)
         {
             if (dropId == (int)Food.Pizza) return 5;
             if (dropId == (int)Food.Choco) return 10;
@@ -362,14 +416,14 @@ namespace First_Independent_Game
             return 0;
         }
 
-        static int GetScorePoints(int dropId)
+        private static int GetScorePoints(int dropId)
         {
             if (dropId == (int)Food.Pizza) return 1;
             if (dropId == (int)Food.Choco) return 2;
             if (dropId == (int)Food.Burger) return 3;
 
-            if (dropId == (int)Danger.Knife) return -2;
-            if (dropId == (int)Danger.Rock) return -5;
+            if (dropId == (int)Danger.Knife) return -1;
+            if (dropId == (int)Danger.Rock) return -2;
 
             return 0;
         }
