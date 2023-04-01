@@ -232,6 +232,8 @@ namespace First_Independent_Game
                             PlaySound(dogSounds[(int)DogSounds.Ouch]);
                             killButtonDown = false;
                             isKilled = true;
+
+                            timeCount = 0;
                         }
                     }
                     if (helpButtonDown)
@@ -256,12 +258,14 @@ namespace First_Independent_Game
                         bool isNoPressed = GetMouseButton(0) && MouseX >= 600
                             && MouseY >= 560 && MouseX <= 817 && MouseY <= 668;
 
-                        if (isYesPressed) break;
-                        if (isNoPressed)
+                        if (isYesPressed && timeCount > 20) break;
+                        if (isNoPressed && timeCount > 20)
                         {
                             isExit = true;
                             break;
                         }
+
+                        timeCount++;
                     }
 
 
@@ -342,6 +346,7 @@ namespace First_Independent_Game
                         {
                             PlaySound(dogSounds[(int)DogSounds.Ouch]);
 
+                            timeCount = 0;
                             hp = 0;
                             isKilled = true;
                         }
