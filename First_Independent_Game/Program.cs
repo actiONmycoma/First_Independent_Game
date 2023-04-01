@@ -126,15 +126,11 @@ namespace First_Independent_Game
             sprite = dogRightMoveSprites[4]
         };
 
-        private static int bestScore = 0;
-
         static void Main(string[] args)
         {
             InitWindow(1024, 690, "Catch Food!");
 
             SetFont("Webcomic.ttf");
-
-            //string[] bestScoreArr = GetBestScoreArr();
 
             bool isExit = false;
 
@@ -519,9 +515,9 @@ namespace First_Independent_Game
         }
         private static void PlayDogPickSound(int dropId)
         {
-            if (dropId == (int)Food.Pizza) PlaySound(dogSounds[(int)DogSounds.Eat]);
-            if (dropId == (int)Food.Choco) PlaySound(dogSounds[(int)DogSounds.Slurp], 9);
-            if (dropId == (int)Food.Burger) PlaySound(dogSounds[(int)DogSounds.Bark2]);
+            if (dropId == (int)Food.Pizza) PlaySound(dogSounds[(int)DogSounds.Eat], 50);
+            if (dropId == (int)Food.Choco) PlaySound(dogSounds[(int)DogSounds.Slurp], 50);
+            if (dropId == (int)Food.Burger) PlaySound(dogSounds[(int)DogSounds.Bark2], 50);
             if (dropId == (int)Danger.Knife) PlaySound(dogSounds[(int)DogSounds.Whine]);
             if (dropId == (int)Danger.Rock) PlaySound(dogSounds[(int)DogSounds.Smack]);
         }
@@ -617,7 +613,7 @@ namespace First_Independent_Game
             int positionIndex = 0;
 
             int index = 0;
-            while (bestScoreArr[index] != null && index < bestScoreArr.Length)
+            while (index < bestScoreArr.Length && bestScoreArr[index] != null )
             {
                 if (score > Convert.ToInt32(bestScoreArr[index]))
                 {
@@ -650,7 +646,7 @@ namespace First_Independent_Game
                 StreamWriter writer = new StreamWriter("best_score.txt");
 
                 index = 0;
-                while (bestScoreArr[index] != null && index < bestScoreArr.Length)
+                while (index < bestScoreArr.Length && bestScoreArr[index] != null)
                 {
                     writer.WriteLine(bestScoreArr[index++]);
                 }
