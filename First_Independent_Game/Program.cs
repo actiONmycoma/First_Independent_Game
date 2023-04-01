@@ -39,12 +39,12 @@ namespace First_Independent_Game
             Play,
             Kill,
             Help,
-            Options,
             Quit,
             PlayMusic,
             UnplayMusic,
             Volume,
-            NoVolume
+            NoVolume,
+            Back
         }
 
         private static string[] dogRightMoveSprites =
@@ -92,12 +92,10 @@ namespace First_Independent_Game
             LoadTexture("play_button.png"),
             LoadTexture("kill.png"),
             LoadTexture("help.png"),
-            LoadTexture("options_button.png"),
             LoadTexture("quit_button.png"),
             LoadTexture("play_music_button.png"),
-            LoadTexture("play_music_button_grey.png"),
-            LoadTexture("volume_button.png"),
-            LoadTexture("volume_button_grey.png")
+            LoadTexture("play_music_button_grey.png")
+
         };
 
         private static string[] dogSounds =
@@ -150,43 +148,46 @@ namespace First_Independent_Game
                 {
                     DispatchEvents();
 
-                    bool isOptionsPressed = false;
-                    bool isPlayPressed = false;
-                    bool isQuitPressed = false;
+                    if (isPlayMusic)
+                        PlayMusic(backgroundMusic, volume);
+                    else
+                        StopMusic(backgroundMusic);
 
-                    if (!isOptionsPressed)
-                    {
-                        isPlayPressed = GetMouseButton(0) && MouseX >= 100
-                                && MouseY >= 250 && MouseX <= 398 && MouseY <= 322;
-                        isOptionsPressed = GetMouseButton(0) && MouseX >= 100
-                                && MouseY >= 350 && MouseX <= 398 && MouseY <= 422;
-                        isQuitPressed = GetMouseButton(0) && MouseX >= 100
-                                && MouseY >= 550 && MouseX <= 398 && MouseY <= 622;
-                    }
+                    bool isPlayPressed = GetMouseButton(0) && MouseX >= 100
+                             && MouseY >= 150 && MouseX <= 398 && MouseY <= 222;
+                    bool isQuitPressed = GetMouseButton(0) && MouseX >= 100
+                             && MouseY >= 550 && MouseX <= 398 && MouseY <= 622;
+
+                    bool isMusicPressed = GetMouseButton(0) && MouseX >= 100
+                             && MouseY >= 280 && MouseX <= 180 && MouseY <= 359;//80:79
+
 
                     if (isPlayPressed) break;
 
-                    if (isQuitPressed && menuTimeCount > 100)
+                    if (isMusicPressed && menuTimeCount > 50)
+                    {
+                        if (isPlayMusic)
+                            isPlayMusic = false;
+                        else
+                            isPlayMusic = true;
+
+                        menuTimeCount = 0;
+                    }
+
+
+                    if (isQuitPressed && menuTimeCount > 50)
                     {
                         isExit = true;
                         break;
                     }
 
-
                     ClearWindow();
 
                     DrawSprite(backgroundImage, 0, 0);
-
                     DrawDog();
-
                     DrawSprite(blurImage, 0, 0);
 
-                    if (!isOptionsPressed)
-                    {
-                        DrawSprite(buttonsSprites[(int)Buttons.Play], 100, 250);//298:72
-                        DrawSprite(buttonsSprites[(int)Buttons.Options], 100, 350);
-                        DrawSprite(buttonsSprites[(int)Buttons.Quit], 100, 550);
-                    }
+                    DrawMainMenu(isPlayMusic);
 
                     DisplayWindow();
 
@@ -194,8 +195,6 @@ namespace First_Independent_Game
 
                     menuTimeCount++;
                 }
-
-
 
                 List<Drop> drops = new List<Drop>();
 
@@ -207,13 +206,16 @@ namespace First_Independent_Game
                 bool killButtonDown = false;
                 bool helpButtonDown = false;
 
-                bool isKilled = true;
+                bool isKilled = false;
 
                 while (!isExit)
                 {
                     DispatchEvents();
 
-                    PlayMusic(backgroundMusic, 7);
+                    if (isPlayMusic)
+                        PlayMusic(backgroundMusic, volume);
+                    else
+                        StopMusic(backgroundMusic);
 
                     if (killButtonDown)
                     {
@@ -385,7 +387,23 @@ namespace First_Independent_Game
         {
             DrawSprite(drop.sprite, drop.x, drop.y);
         }
+        private static void DrawMainMenu(bool isPlayMusic)
+        {
+            DrawSprite(buttonsSprites[(int)Buttons.Play], 100, 150);
+            DrawSprite(buttonsSprites[(int)Buttons.Quit], 100, 550);
 
+            if (isPlayMusic)
+            {
+                DrawSprite(buttonsSprites[(int)Buttons.PlayMusic], 100, 280);
+            }
+            else
+            {
+                DrawSprite(buttonsSprites[(int)Buttons.UnplayMusic], 100, 280);
+            }
+
+            DrawText(190, 295, "background music", 40);
+
+        }
         private static void DrawHelpMenu()
         {
             SetFillColor(255, 255, 255);
@@ -415,7 +433,6 @@ namespace First_Independent_Game
             DrawSprite(buttonsSprites[(int)Buttons.Continue], 350, 580);
 
         }
-
         private static void DrawSuicideMenu()
         {
             SetFillColor(210, 10, 46);
@@ -425,7 +442,6 @@ namespace First_Independent_Game
             DrawSprite(buttonsSprites[(int)Buttons.Yes], 200, 500);
             DrawSprite(buttonsSprites[(int)Buttons.No], 600, 500);
         }
-
         private static void DrawEndGameMenu(int score, int bestScore)
         {
             SetFillColor(255, 255, 255);
@@ -440,7 +456,6 @@ namespace First_Independent_Game
             DrawSprite(buttonsSprites[(int)Buttons.Yes], 200, 560);
             DrawSprite(buttonsSprites[(int)Buttons.No], 600, 560);
         }
-
         private static void PlayDogPickSound(int dropId)
         {
             if (dropId == (int)Food.Pizza) PlaySound(dogSounds[(int)DogSounds.Eat]);
@@ -449,7 +464,6 @@ namespace First_Independent_Game
             if (dropId == (int)Danger.Knife) PlaySound(dogSounds[(int)DogSounds.Whine]);
             if (dropId == (int)Danger.Rock) PlaySound(dogSounds[(int)DogSounds.Smack]);
         }
-
         private static (string sprite, int id) GetRandomDropItem(int score)
         {
             Random rnd = new Random();
@@ -478,7 +492,6 @@ namespace First_Independent_Game
 
             return (image, id);
         }
-
         private static int GetHealOrDamage(int dropId)
         {
             if (dropId == (int)Food.Pizza) return 5;
@@ -490,7 +503,6 @@ namespace First_Independent_Game
 
             return 0;
         }
-
         private static int GetScorePoints(int dropId)
         {
             if (dropId == (int)Food.Pizza) return 1;
