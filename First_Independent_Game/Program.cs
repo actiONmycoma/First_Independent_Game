@@ -162,7 +162,7 @@ namespace First_Independent_Game
 
                     if (isPlayPressed) break;
 
-                    if (isMusicPressed && menuTimeCount > 50)
+                    if (isMusicPressed && menuTimeCount > 20)
                     {
                         if (isPlayMusic)
                             isPlayMusic = false;
@@ -173,7 +173,7 @@ namespace First_Independent_Game
                     }
 
 
-                    if (isQuitPressed && menuTimeCount > 50)
+                    if (isQuitPressed && menuTimeCount > 20)
                     {
                         isExit = true;
                         break;
@@ -484,7 +484,7 @@ namespace First_Independent_Game
         private static void PlayDogPickSound(int dropId)
         {
             if (dropId == (int)Food.Pizza) PlaySound(dogSounds[(int)DogSounds.Eat]);
-            if (dropId == (int)Food.Choco) PlaySound(dogSounds[(int)DogSounds.Slurp]);
+            if (dropId == (int)Food.Choco) PlaySound(dogSounds[(int)DogSounds.Slurp],7);
             if (dropId == (int)Food.Burger) PlaySound(dogSounds[(int)DogSounds.Bark2]);
             if (dropId == (int)Danger.Knife) PlaySound(dogSounds[(int)DogSounds.Whine]);
             if (dropId == (int)Danger.Rock) PlaySound(dogSounds[(int)DogSounds.Smack]);
