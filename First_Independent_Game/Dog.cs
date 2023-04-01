@@ -66,7 +66,7 @@ namespace First_Independent_Game
             }
 
             collider.y = y + 25;
-            collider.height = 120;
+            collider.height = 110;
         }
         public bool IsEat(Drop drop)
         {
