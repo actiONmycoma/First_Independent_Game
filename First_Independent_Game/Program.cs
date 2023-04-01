@@ -1,7 +1,6 @@
 ﻿using System;
 using SFML.Learning;
 using System.Collections.Generic;
-using SFML.Window;
 
 namespace First_Independent_Game
 {
@@ -17,20 +16,17 @@ namespace First_Independent_Game
             Whine,
             Eat
         }
-
         private enum Food
         {
             Pizza,
             Choco,
             Burger
         }
-
         private enum Danger
         {
             Rock = 3,
             Knife
         }
-
         private enum Buttons
         {
             Yes,
@@ -127,7 +123,7 @@ namespace First_Independent_Game
             direction = 0,
             speed = 500,
             sprite = dogRightMoveSprites[4]
-        };
+        };               
 
         private static int bestScore = 0;
 
@@ -281,7 +277,10 @@ namespace First_Independent_Game
                             oldDogX = dog.x;
                         }
                         else
+                        {
                             deltaMove = 0;
+                        }
+
 
                         spawnMultiplier = score;
                         if (spawnMultiplier >= 100) spawnMultiplier = 99;
@@ -400,33 +399,11 @@ namespace First_Independent_Game
                 return;
             }
 
-            string[] frames = new string[12];
-            int frameIndex = deltaMove % 12;
+            string[] frames =_getFramesArr();
+            int frameIndex = deltaMove % 12;            
 
-            if (dog.direction == 1)
-            {
-                for (int i = 0; i < dogLeftMoveSprites.Length - 1; i++)
-                {
-                    for (int j = i * 3; j < i * 3 + 3; j++)
-                    {
-                        frames[j] = dogLeftMoveSprites[i];
-                    }
-                }
-            }
-            if (dog.direction == 2)
-            {
-                for (int i = 0; i < dogRightMoveSprites.Length - 1; i++)
-                {
-                    for (int j = i * 3; j < i * 3 + 3; j++)
-                    {
-                        frames[j] = dogRightMoveSprites[i];
-                    }
-                }
-            }
-
-            DrawSprite(frames[frameIndex], dog.x, dog.y);            
+            DrawSprite(frames[frameIndex], dog.x, dog.y);
         }
-
         private static void DrawDrop(Drop drop)
         {
             DrawSprite(drop.sprite, drop.x, drop.y);
@@ -561,6 +538,33 @@ namespace First_Independent_Game
             if (dropId == (int)Danger.Rock) return -2;
 
             return 0;
+        }
+        private static string[] _getFramesArr()
+        {
+            string[] frames = new string[12];
+
+            if (dog.direction == 1)
+            {
+                for (int i = 0; i < dogLeftMoveSprites.Length - 1; i++)
+                {
+                    for (int j = i * 3; j < i * 3 + 3; j++)
+                    {
+                        frames[j] = dogLeftMoveSprites[i];
+                    }
+                }
+            }
+            if (dog.direction == 2)
+            {
+                for (int i = 0; i < dogRightMoveSprites.Length - 1; i++)
+                {
+                    for (int j = i * 3; j < i * 3 + 3; j++)
+                    {
+                        frames[j] = dogRightMoveSprites[i];
+                    }
+                }
+            }
+
+            return frames;
         }
     }
 }

@@ -22,7 +22,6 @@ namespace First_Independent_Game
         {
             y += speed * DeltaTime;
         }
-
         public void GetCollider()
         {
             collider.x = x + 5;
