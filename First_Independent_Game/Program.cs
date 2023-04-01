@@ -613,7 +613,7 @@ namespace First_Independent_Game
             int positionIndex = 0;
 
             int index = 0;
-            while (index < bestScoreArr.Length && bestScoreArr[index] != null )
+            while (index < bestScoreArr.Length && bestScoreArr[index] != null)
             {
                 if (score > Convert.ToInt32(bestScoreArr[index]))
                 {
@@ -633,12 +633,9 @@ namespace First_Independent_Game
 
             if (positionIndex != -1)
             {
-                if (positionIndex > 0)
+                for (int i = bestScoreArr.Length - 1; i > positionIndex; i--)
                 {
-                    for (int i = bestScoreArr.Length - 1; i >= positionIndex; i--)
-                    {
-                        bestScoreArr[i] = bestScoreArr[i - 1];
-                    }
+                    bestScoreArr[i] = bestScoreArr[i - 1];
                 }
 
                 bestScoreArr[positionIndex] = Convert.ToString(score);
