@@ -50,17 +50,41 @@ namespace First_Independent_Game
         private static string[] dogRightMoveSprites =
         {
             LoadTexture("move_right_0.png"),
+            LoadTexture("move_right_0.png"),
+            LoadTexture("move_right_0.png"),
+
             LoadTexture("move_right_1.png"),
+            LoadTexture("move_right_1.png"),
+            LoadTexture("move_right_1.png"),
+
             LoadTexture("move_right_2.png"),
+            LoadTexture("move_right_2.png"),
+            LoadTexture("move_right_2.png"),
+
             LoadTexture("move_right_3.png"),
+            LoadTexture("move_right_3.png"),
+            LoadTexture("move_right_3.png"),
+
             LoadTexture("no_move_sit_right.png")
         };
         private static string[] dogLeftMoveSprites =
         {
             LoadTexture("move_left_0.png"),
+            LoadTexture("move_left_0.png"),
+            LoadTexture("move_left_0.png"),
+
             LoadTexture("move_left_1.png"),
+            LoadTexture("move_left_1.png"),
+            LoadTexture("move_left_1.png"),
+
             LoadTexture("move_left_2.png"),
+            LoadTexture("move_left_2.png"),
+            LoadTexture("move_left_2.png"),
+
             LoadTexture("move_left_3.png"),
+            LoadTexture("move_left_3.png"),
+            LoadTexture("move_left_3.png"),
+
             LoadTexture("no_move_sit_left.png")
         };
 
@@ -203,6 +227,9 @@ namespace First_Independent_Game
                 int hp = 503;
                 int score = 0;
 
+                float oldDogX = dog.x;
+                int deltaMove = 0;
+
                 bool killButtonDown = false;
                 bool helpButtonDown = false;
 
@@ -265,8 +292,18 @@ namespace First_Independent_Game
 
                     if (!killButtonDown && !helpButtonDown && !isKilled)
                     {
+                        int oldDogDirection = dog.direction;
+
                         dog.Move();
                         dog.GetCollider();
+
+                        if (oldDogDirection == dog.direction && oldDogX != dog.x)
+                        {
+                            deltaMove++;
+                            oldDogX = dog.x;
+                        }
+                        else
+                            deltaMove = 0;
 
                         spawnMultiplier = score;
                         if (spawnMultiplier >= 100) spawnMultiplier = 99;
@@ -337,13 +374,12 @@ namespace First_Independent_Game
 
                     DrawSprite(backgroundImage, 0, 0);
 
-
                     for (int i = 0; i < drops.Count; i++)
                     {
                         DrawDrop(drops[i]);
                     }
 
-                    DrawDog();
+                    DrawDog(deltaMove);
 
                     DrawSprite(healthBar, 10, 20);
                     SetFillColor(240, 39, 39);
@@ -373,14 +409,15 @@ namespace First_Independent_Game
 
         }
 
-        private static void DrawDog()
+        private static void DrawDog(int deltaMove = 0)
         {
-            if (dog.direction == -1) DrawSprite(dogLeftMoveSprites[4], dog.x, dog.y);
-            if (dog.direction == 0) DrawSprite(dogRightMoveSprites[4], dog.x, dog.y);
+            if (dog.direction == -1) DrawSprite(dogLeftMoveSprites[dogLeftMoveSprites.Length - 1], dog.x, dog.y);
+            if (dog.direction == 0) DrawSprite(dogRightMoveSprites[dogRightMoveSprites.Length - 1], dog.x, dog.y);
 
-            if (dog.direction == 1) DrawSprite(dogLeftMoveSprites[0], dog.x, dog.y);
+            int spriteIndex = deltaMove % 12;
 
-            if (dog.direction == 2) DrawSprite(dogRightMoveSprites[0], dog.x, dog.y);
+            if (dog.direction == 1) DrawSprite(dogLeftMoveSprites[spriteIndex], dog.x, dog.y);
+            if (dog.direction == 2) DrawSprite(dogRightMoveSprites[spriteIndex], dog.x, dog.y);
         }
 
         private static void DrawDrop(Drop drop)
