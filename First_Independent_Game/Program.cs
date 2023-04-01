@@ -50,19 +50,8 @@ namespace First_Independent_Game
         private static string[] dogRightMoveSprites =
         {
             LoadTexture("move_right_0.png"),
-            LoadTexture("move_right_0.png"),
-            LoadTexture("move_right_0.png"),
-
             LoadTexture("move_right_1.png"),
-            LoadTexture("move_right_1.png"),
-            LoadTexture("move_right_1.png"),
-
             LoadTexture("move_right_2.png"),
-            LoadTexture("move_right_2.png"),
-            LoadTexture("move_right_2.png"),
-
-            LoadTexture("move_right_3.png"),
-            LoadTexture("move_right_3.png"),
             LoadTexture("move_right_3.png"),
 
             LoadTexture("no_move_sit_right.png")
@@ -70,19 +59,8 @@ namespace First_Independent_Game
         private static string[] dogLeftMoveSprites =
         {
             LoadTexture("move_left_0.png"),
-            LoadTexture("move_left_0.png"),
-            LoadTexture("move_left_0.png"),
-
             LoadTexture("move_left_1.png"),
-            LoadTexture("move_left_1.png"),
-            LoadTexture("move_left_1.png"),
-
             LoadTexture("move_left_2.png"),
-            LoadTexture("move_left_2.png"),
-            LoadTexture("move_left_2.png"),
-
-            LoadTexture("move_left_3.png"),
-            LoadTexture("move_left_3.png"),
             LoadTexture("move_left_3.png"),
 
             LoadTexture("no_move_sit_left.png")
@@ -411,13 +389,42 @@ namespace First_Independent_Game
 
         private static void DrawDog(int deltaMove = 0)
         {
-            if (dog.direction == -1) DrawSprite(dogLeftMoveSprites[dogLeftMoveSprites.Length - 1], dog.x, dog.y);
-            if (dog.direction == 0) DrawSprite(dogRightMoveSprites[dogRightMoveSprites.Length - 1], dog.x, dog.y);
+            if (dog.direction == -1)
+            {
+                DrawSprite(dogLeftMoveSprites[dogLeftMoveSprites.Length - 1], dog.x, dog.y);
+                return;
+            }
+            if (dog.direction == 0)
+            {
+                DrawSprite(dogRightMoveSprites[dogRightMoveSprites.Length - 1], dog.x, dog.y);
+                return;
+            }
 
-            int spriteIndex = deltaMove % 12;
+            string[] frames = new string[12];
+            int frameIndex = deltaMove % 12;
 
-            if (dog.direction == 1) DrawSprite(dogLeftMoveSprites[spriteIndex], dog.x, dog.y);
-            if (dog.direction == 2) DrawSprite(dogRightMoveSprites[spriteIndex], dog.x, dog.y);
+            if (dog.direction == 1)
+            {
+                for (int i = 0; i < dogLeftMoveSprites.Length - 1; i++)
+                {
+                    for (int j = i * 3; j < i * 3 + 3; j++)
+                    {
+                        frames[j] = dogLeftMoveSprites[i];
+                    }
+                }
+            }
+            if (dog.direction == 2)
+            {
+                for (int i = 0; i < dogRightMoveSprites.Length - 1; i++)
+                {
+                    for (int j = i * 3; j < i * 3 + 3; j++)
+                    {
+                        frames[j] = dogRightMoveSprites[i];
+                    }
+                }
+            }
+
+            DrawSprite(frames[frameIndex], dog.x, dog.y);            
         }
 
         private static void DrawDrop(Drop drop)
