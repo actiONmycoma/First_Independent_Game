@@ -127,6 +127,7 @@ namespace First_Independent_Game
             sprite = dogRightMoveSprites[4]
         };
 
+        private static int bestScore = 0;
 
         static void Main(string[] args)
         {
@@ -134,7 +135,6 @@ namespace First_Independent_Game
 
             SetFont("Webcomic.ttf");
 
-            int bestScore = 0;
             bool isExit = false;
 
             while (!isExit)
@@ -403,6 +403,10 @@ namespace First_Independent_Game
 
             DrawText(190, 295, "background music", 40);
 
+            SetFillColor(235, 25, 31);
+            DrawText(750, 160, "Best score", 40);
+            SetFillColor(255, 255, 255);
+            DrawText(750, 220, Convert.ToString(bestScore), 40);
         }
         private static void DrawHelpMenu()
         {
@@ -436,8 +440,8 @@ namespace First_Independent_Game
         private static void DrawSuicideMenu()
         {
             SetFillColor(210, 10, 46);
-
             DrawText(220, 300, "WANNA  SUICIDE?", 80);
+            SetFillColor(255, 255, 255);
 
             DrawSprite(buttonsSprites[(int)Buttons.Yes], 200, 500);
             DrawSprite(buttonsSprites[(int)Buttons.No], 600, 500);
