@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using SFML.Learning;
 using System.Collections.Generic;
 
@@ -123,7 +124,7 @@ namespace First_Independent_Game
             direction = 0,
             speed = 500,
             sprite = dogRightMoveSprites[4]
-        };               
+        };
 
         private static int bestScore = 0;
 
@@ -132,6 +133,8 @@ namespace First_Independent_Game
             InitWindow(1024, 690, "Catch Food!");
 
             SetFont("Webcomic.ttf");
+
+            //string[] bestScoreArr = GetBestScoreArr();
 
             bool isExit = false;
 
@@ -208,6 +211,7 @@ namespace First_Independent_Game
                 bool helpButtonDown = false;
 
                 bool isKilled = false;
+                bool isInBest = false;
 
                 while (!isExit)
                 {
@@ -244,6 +248,12 @@ namespace First_Independent_Game
 
                     if (isKilled)
                     {
+                        if (isInBest)
+                        {
+                            WriteInBestFile(score);
+                            isInBest = false;
+                        }
+
                         bool isYesPressed = GetMouseButton(0) && MouseX >= 200
                             && MouseY >= 560 && MouseX <= 417 && MouseY <= 668;
 
@@ -258,14 +268,15 @@ namespace First_Independent_Game
                         }
                     }
 
-                    if (GetMouseButton(0) == true)
-                    {
-                        if (MouseX >= 950 && MouseX <= 1010 && MouseY >= 20 && MouseY <= 85) killButtonDown = true;
-                        if (MouseX >= 950 && MouseX <= 1010 && MouseY >= 100 && MouseY <= 160) helpButtonDown = true;
-                    }
 
                     if (!killButtonDown && !helpButtonDown && !isKilled)
                     {
+                        if (GetMouseButton(0) == true)
+                        {
+                            if (MouseX >= 950 && MouseX <= 1010 && MouseY >= 20 && MouseY <= 85) killButtonDown = true;
+                            if (MouseX >= 950 && MouseX <= 1010 && MouseY >= 100 && MouseY <= 160) helpButtonDown = true;
+                        }
+
                         int oldDogDirection = dog.direction;
 
                         dog.Move();
@@ -280,7 +291,6 @@ namespace First_Independent_Game
                         {
                             deltaMove = 0;
                         }
-
 
                         spawnMultiplier = score;
                         if (spawnMultiplier >= 100) spawnMultiplier = 99;
@@ -342,7 +352,7 @@ namespace First_Independent_Game
 
                         if (isKilled)
                         {
-                            if (score > bestScore) bestScore = score;
+                            isInBest = CanIncludeInBestArr(score);
                         }
 
                     }
@@ -374,7 +384,7 @@ namespace First_Independent_Game
 
                         if (killButtonDown) DrawSuicideMenu();
                         if (helpButtonDown) DrawHelpMenu();
-                        if (isKilled) DrawEndGameMenu(score, bestScore);
+                        if (isKilled) DrawEndGameMenu(score);
                     }
 
                     DisplayWindow();
@@ -399,8 +409,8 @@ namespace First_Independent_Game
                 return;
             }
 
-            string[] frames =_getFramesArr();
-            int frameIndex = deltaMove % 12;            
+            string[] frames = _getFramesArr();
+            int frameIndex = deltaMove % 12;
 
             DrawSprite(frames[frameIndex], dog.x, dog.y);
         }
@@ -427,7 +437,20 @@ namespace First_Independent_Game
             SetFillColor(235, 25, 31);
             DrawText(750, 160, "Best score", 40);
             SetFillColor(255, 255, 255);
-            DrawText(750, 220, Convert.ToString(bestScore), 40);
+
+            string[] bestScoreArr = _getBestScoreArr();
+
+            int y = 220;
+
+            for (int i = 0; i < bestScoreArr.Length; i++)
+            {
+                if (bestScoreArr[i] != null)
+                {
+                    DrawText(750, y, bestScoreArr[i], 30);
+                    y += 40;
+                }
+            }
+
         }
         private static void DrawHelpMenu()
         {
@@ -467,14 +490,27 @@ namespace First_Independent_Game
             DrawSprite(buttonsSprites[(int)Buttons.Yes], 200, 500);
             DrawSprite(buttonsSprites[(int)Buttons.No], 600, 500);
         }
-        private static void DrawEndGameMenu(int score, int bestScore)
+        private static void DrawEndGameMenu(int score)
         {
             SetFillColor(255, 255, 255);
 
-            DrawSprite(gameOverImage, 330, 100);
+            DrawSprite(gameOverImage, 330, 50);
 
-            DrawText(200, 400, $"score: {score}", 30);
-            DrawText(600, 400, $"best score: {bestScore}", 30);
+            DrawText(200, 300, $"score: {score}", 30);
+            DrawText(650, 300, $"best score", 30);
+
+            string[] bestScoreArr = _getBestScoreArr();
+            int y = 340;
+            for (int i = 0; i < bestScoreArr.Length; i++)
+            {
+                if (bestScoreArr[i] != null)
+                {
+                    if (score == Convert.ToInt32(bestScoreArr[i])) SetFillColor(210, 10, 46);
+                    DrawText(650, y, bestScoreArr[i], 25);
+                    SetFillColor(255, 255, 255);
+                    y += 30;
+                }
+            }
 
             DrawText(340, 500, "go to main menu?", 40);
 
@@ -484,7 +520,7 @@ namespace First_Independent_Game
         private static void PlayDogPickSound(int dropId)
         {
             if (dropId == (int)Food.Pizza) PlaySound(dogSounds[(int)DogSounds.Eat]);
-            if (dropId == (int)Food.Choco) PlaySound(dogSounds[(int)DogSounds.Slurp],7);
+            if (dropId == (int)Food.Choco) PlaySound(dogSounds[(int)DogSounds.Slurp], 9);
             if (dropId == (int)Food.Burger) PlaySound(dogSounds[(int)DogSounds.Bark2]);
             if (dropId == (int)Danger.Knife) PlaySound(dogSounds[(int)DogSounds.Whine]);
             if (dropId == (int)Danger.Rock) PlaySound(dogSounds[(int)DogSounds.Smack]);
@@ -538,6 +574,89 @@ namespace First_Independent_Game
             if (dropId == (int)Danger.Rock) return -2;
 
             return 0;
+        }
+        private static string[] _getBestScoreArr()
+        {
+            string[] scoreArr = new string[5];
+
+            StreamReader reader = new StreamReader("best_score.txt");
+
+            string line = reader.ReadLine();
+
+            int index = 0;
+            while (line != null)
+            {
+                scoreArr[index++] = line;
+                line = reader.ReadLine();
+            }
+
+            reader.Close();
+
+            return scoreArr;
+        }
+        private static bool CanIncludeInBestArr(int score)
+        {
+            string[] scoreArr = _getBestScoreArr();
+
+            for (int i = 0; i < scoreArr.Length; i++)
+            {
+                if (scoreArr[i] == null) return true;
+
+                if (score > Convert.ToInt32(scoreArr[i]))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        private static void WriteInBestFile(int score)
+        {
+            string[] bestScoreArr = _getBestScoreArr();
+
+            int positionIndex = 0;
+
+            int index = 0;
+            while (bestScoreArr[index] != null && index < bestScoreArr.Length)
+            {
+                if (score > Convert.ToInt32(bestScoreArr[index]))
+                {
+                    positionIndex = index++;
+                    break;
+                }
+                else if (score == Convert.ToInt32(bestScoreArr[index]))
+                {
+                    positionIndex = -1;
+                }
+                else
+                {
+                    positionIndex++;
+                    index++;
+                }
+            }
+
+            if (positionIndex != -1)
+            {
+                if (positionIndex > 0)
+                {
+                    for (int i = bestScoreArr.Length - 1; i >= positionIndex; i--)
+                    {
+                        bestScoreArr[i] = bestScoreArr[i - 1];
+                    }
+                }
+
+                bestScoreArr[positionIndex] = Convert.ToString(score);
+
+                StreamWriter writer = new StreamWriter("best_score.txt");
+
+                index = 0;
+                while (bestScoreArr[index] != null && index < bestScoreArr.Length)
+                {
+                    writer.WriteLine(bestScoreArr[index++]);
+                }
+
+                writer.Close();
+            }
         }
         private static string[] _getFramesArr()
         {
