@@ -1,9 +1,7 @@
 ﻿using System;
-using SFML.Window;
 using SFML.Learning;
 using System.Collections.Generic;
-using First_Independent_Game;
-using First_Independent_Game.Models;
+using SFML.Window;
 
 namespace First_Independent_Game
 {
@@ -25,7 +23,7 @@ namespace First_Independent_Game
             Pizza,
             Choco,
             Burger
-        }        
+        }
 
         private enum Danger
         {
@@ -33,7 +31,23 @@ namespace First_Independent_Game
             Knife
         }
 
-        private static string[] dogRightMove =
+        private enum Buttons
+        {
+            Yes,
+            No,
+            Continue,
+            Play,
+            Kill,
+            Help,
+            Options,
+            Quit,
+            PlayMusic,
+            UnplayMusic,
+            Volume,
+            NoVolume
+        }
+
+        private static string[] dogRightMoveSprites =
         {
             LoadTexture("move_right_0.png"),
             LoadTexture("move_right_1.png"),
@@ -41,7 +55,7 @@ namespace First_Independent_Game
             LoadTexture("move_right_3.png"),
             LoadTexture("no_move_sit_right.png")
         };
-        private static string[] dogLeftMove =
+        private static string[] dogLeftMoveSprites =
         {
             LoadTexture("move_left_0.png"),
             LoadTexture("move_left_1.png"),
@@ -50,31 +64,40 @@ namespace First_Independent_Game
             LoadTexture("no_move_sit_left.png")
         };
 
-        private static string[] foodImage =
+        private static string[] foodSprites =
         {
             LoadTexture("pizza.png"),
             LoadTexture("choco.png"),
             LoadTexture("burger.png")
         };
 
-        private static string[] dangerImage =
+        private static string[] dangerSprites =
         {
             LoadTexture("rock.png"),
             LoadTexture("knife.png")
         };
 
-        private static string[] moveButtonsImage =
+        private static string[] moveButtonsSprites =
         {
             LoadTexture("a_key_white.png"),
             LoadTexture("d_key_white.png"),
             LoadTexture("s_key_white.png")
         };
 
-        private static string[] buttons =
+        private static string[] buttonsSprites =
         {
             LoadTexture("yes_button.png"),
             LoadTexture("no_button.png"),
-            LoadTexture("continue_button.png")
+            LoadTexture("continue_button.png"),
+            LoadTexture("play_button.png"),
+            LoadTexture("kill.png"),
+            LoadTexture("help.png"),
+            LoadTexture("options_button.png"),
+            LoadTexture("quit_button.png"),
+            LoadTexture("play_music_button.png"),
+            LoadTexture("play_music_button_grey.png"),
+            LoadTexture("volume_button.png"),
+            LoadTexture("volume_button_grey.png")
         };
 
         private static string[] dogSounds =
@@ -95,9 +118,6 @@ namespace First_Independent_Game
 
         private static string healthBar = LoadTexture("health_bar.png");
 
-        private static string help = LoadTexture("help.png");
-        private static string kill = LoadTexture("kill.png");
-
         private static string gameOverImage = LoadTexture("game_over_white.png");
 
         private static Dog dog = new Dog()
@@ -106,7 +126,7 @@ namespace First_Independent_Game
             y = 560,
             direction = 0,
             speed = 500,
-            sprite = dogRightMove[4]
+            sprite = dogRightMoveSprites[4]
         };
 
 
@@ -121,7 +141,61 @@ namespace First_Independent_Game
 
             while (!isExit)
             {
-                PlayMusic(backgroundMusic, 7);
+                int volume = 7;
+                bool isPlayMusic = true;
+
+                int menuTimeCount = 0;
+
+                while (true)
+                {
+                    DispatchEvents();
+
+                    bool isOptionsPressed = false;
+                    bool isPlayPressed = false;
+                    bool isQuitPressed = false;
+
+                    if (!isOptionsPressed)
+                    {
+                        isPlayPressed = GetMouseButton(0) && MouseX >= 100
+                                && MouseY >= 250 && MouseX <= 398 && MouseY <= 322;
+                        isOptionsPressed = GetMouseButton(0) && MouseX >= 100
+                                && MouseY >= 350 && MouseX <= 398 && MouseY <= 422;
+                        isQuitPressed = GetMouseButton(0) && MouseX >= 100
+                                && MouseY >= 550 && MouseX <= 398 && MouseY <= 622;
+                    }
+
+                    if (isPlayPressed) break;
+
+                    if (isQuitPressed && menuTimeCount > 100)
+                    {
+                        isExit = true;
+                        break;
+                    }
+
+
+                    ClearWindow();
+
+                    DrawSprite(backgroundImage, 0, 0);
+
+                    DrawDog();
+
+                    DrawSprite(blurImage, 0, 0);
+
+                    if (!isOptionsPressed)
+                    {
+                        DrawSprite(buttonsSprites[(int)Buttons.Play], 100, 250);//298:72
+                        DrawSprite(buttonsSprites[(int)Buttons.Options], 100, 350);
+                        DrawSprite(buttonsSprites[(int)Buttons.Quit], 100, 550);
+                    }
+
+                    DisplayWindow();
+
+                    Delay(1);
+
+                    menuTimeCount++;
+                }
+
+
 
                 List<Drop> drops = new List<Drop>();
 
@@ -133,11 +207,13 @@ namespace First_Independent_Game
                 bool killButtonDown = false;
                 bool helpButtonDown = false;
 
-                bool isKilled = false;
+                bool isKilled = true;
 
-                while (true)
+                while (!isExit)
                 {
                     DispatchEvents();
+
+                    PlayMusic(backgroundMusic, 7);
 
                     if (killButtonDown)
                     {
@@ -220,7 +296,6 @@ namespace First_Independent_Game
                             if (drops[i].y > 690)
                             {
                                 drops.RemoveAt(i);
-                                if (drops[i].id < Enum.GetValues(typeof(Food)).Length) score--;
                             }
                         }
 
@@ -275,8 +350,8 @@ namespace First_Independent_Game
                     SetFillColor(0, 0, 0);
                     DrawText(70, 80, $"SCORE: {score}", 30);
 
-                    DrawSprite(kill, 950, 20);
-                    DrawSprite(help, 950, 100);                   
+                    DrawSprite(buttonsSprites[(int)Buttons.Kill], 950, 20);
+                    DrawSprite(buttonsSprites[(int)Buttons.Help], 950, 100);
 
                     if (killButtonDown || helpButtonDown || isKilled)
                     {
@@ -298,12 +373,12 @@ namespace First_Independent_Game
 
         private static void DrawDog()
         {
-            if (dog.direction == -1) DrawSprite(dogLeftMove[4], dog.x, dog.y);
-            if (dog.direction == 0) DrawSprite(dogRightMove[4], dog.x, dog.y);
+            if (dog.direction == -1) DrawSprite(dogLeftMoveSprites[4], dog.x, dog.y);
+            if (dog.direction == 0) DrawSprite(dogRightMoveSprites[4], dog.x, dog.y);
 
-            if (dog.direction == 1) DrawSprite(dogLeftMove[0], dog.x, dog.y);
+            if (dog.direction == 1) DrawSprite(dogLeftMoveSprites[0], dog.x, dog.y);
 
-            if (dog.direction == 2) DrawSprite(dogRightMove[0], dog.x, dog.y);
+            if (dog.direction == 2) DrawSprite(dogRightMoveSprites[0], dog.x, dog.y);
         }
 
         private static void DrawDrop(Drop drop)
@@ -315,29 +390,29 @@ namespace First_Independent_Game
         {
             SetFillColor(255, 255, 255);
 
-            DrawSprite(moveButtonsImage[0], 70, 120);
-            DrawSprite(moveButtonsImage[1], 67, 220);
-            DrawSprite(moveButtonsImage[2], 66, 315);
+            DrawSprite(moveButtonsSprites[0], 70, 120);
+            DrawSprite(moveButtonsSprites[1], 67, 220);
+            DrawSprite(moveButtonsSprites[2], 66, 315);
 
             DrawText(167, 137, "move left", 40);
             DrawText(167, 237, "move right", 40);
             DrawText(167, 337, "if you want to seat", 40);
 
-            for (int i = 0; i < foodImage.Length; i++)
+            for (int i = 0; i < foodSprites.Length; i++)
             {
-                DrawSprite(foodImage[i], 70 + i * 60, 450);
+                DrawSprite(foodSprites[i], 70 + i * 60, 450);
             }
 
             DrawText(260, 460, "eat this to heal and take points", 30);
 
-            for (int i = 0; i < dangerImage.Length; i++)
+            for (int i = 0; i < dangerSprites.Length; i++)
             {
-                DrawSprite(dangerImage[i], 70 + i * 70, 520);
+                DrawSprite(dangerSprites[i], 70 + i * 70, 520);
             }
 
             DrawText(260, 520, "avoid this to stay alive", 30);
 
-            DrawSprite(buttons[2], 350, 580);
+            DrawSprite(buttonsSprites[(int)Buttons.Continue], 350, 580);
 
         }
 
@@ -347,8 +422,8 @@ namespace First_Independent_Game
 
             DrawText(220, 300, "WANNA  SUICIDE?", 80);
 
-            DrawSprite(buttons[0], 200, 500);
-            DrawSprite(buttons[1], 600, 500);
+            DrawSprite(buttonsSprites[(int)Buttons.Yes], 200, 500);
+            DrawSprite(buttonsSprites[(int)Buttons.No], 600, 500);
         }
 
         private static void DrawEndGameMenu(int score, int bestScore)
@@ -362,8 +437,8 @@ namespace First_Independent_Game
 
             DrawText(340, 500, "go to main menu?", 40);
 
-            DrawSprite(buttons[0], 200, 560);
-            DrawSprite(buttons[1], 600, 560);
+            DrawSprite(buttonsSprites[(int)Buttons.Yes], 200, 560);
+            DrawSprite(buttonsSprites[(int)Buttons.No], 600, 560);
         }
 
         private static void PlayDogPickSound(int dropId)
@@ -390,14 +465,14 @@ namespace First_Independent_Game
 
             if (chance <= 30 + scoreMultiplier)
             {
-                int index = rnd.Next(dangerImage.Length);
-                image = dangerImage[index];
+                int index = rnd.Next(dangerSprites.Length);
+                image = dangerSprites[index];
                 id = index + Enum.GetValues(typeof(Food)).Length;
             }
             else
             {
-                int index = rnd.Next(foodImage.Length);
-                image = foodImage[index];
+                int index = rnd.Next(foodSprites.Length);
+                image = foodSprites[index];
                 id = index;
             }
 
