@@ -497,8 +497,10 @@ namespace First_Independent_Game
 
             DrawSprite(gameOverImage, 330, 50);
 
-            DrawText(200, 300, $"score: {score}", 30);
-            DrawText(650, 300, $"best score", 30);
+            DrawText(200, 300, "score:", 30);
+            DrawText(200, 340, $"{score}", 25);
+
+            DrawText(650, 300, "best score:", 30);
 
             string[] bestScoreArr = _getBestScoreArr();
             int y = 340;
