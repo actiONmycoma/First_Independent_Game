@@ -230,6 +230,7 @@ namespace First_Independent_Game
                         if (isYesPressed)
                         {
                             PlaySound(dogSounds[(int)DogSounds.Ouch]);
+                            isInBest = CanIncludeInBestArr(score);
                             killButtonDown = false;
                             isKilled = true;
 
@@ -267,7 +268,6 @@ namespace First_Independent_Game
 
                         timeCount++;
                     }
-
 
                     if (!killButtonDown && !helpButtonDown && !isKilled)
                     {
