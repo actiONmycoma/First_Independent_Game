@@ -36,7 +36,7 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject />
+    <StartupObject>First_Independent_Game.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup />
   <ItemGroup>
